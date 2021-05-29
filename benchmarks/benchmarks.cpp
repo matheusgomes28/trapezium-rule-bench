@@ -27,9 +27,9 @@ static void BM_EigenImplementation(benchmark::State& state)
 {
 	// f(x) = e^(-x^2) implemented with Eigen3
 	// functions
-	const auto f = [](auto const& X) -> Eigen::ArrayXd
+	const auto f = [](auto const& X) -> Eigen::VectorXd
 	{
-		return Eigen::exp(-X.cwiseProduct(X));
+		return Eigen::exp(-X.array().square());
 	};
 
 	for (auto _ : state)
@@ -38,7 +38,6 @@ static void BM_EigenImplementation(benchmark::State& state)
 		benchmark::DoNotOptimize(area);
 	}
 }
-
 
 auto bm_standard_traps10x10x100= BM_StandardImplementation<-10, 10, 100>;
 BENCHMARK(bm_standard_traps10x10x100);
