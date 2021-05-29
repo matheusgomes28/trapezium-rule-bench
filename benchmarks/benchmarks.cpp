@@ -5,24 +5,19 @@
 
 #include <cmath>
 
-
-
-auto f(double x)
-{
-	return std::exp(-x * x);
-};
-
-auto f_eigen(Eigen::ArrayXd const& X) -> Eigen::VectorXd
-{
-	return Eigen::exp(-X.cwiseProduct(X));
-}
-
 template<int a, int b, std::size_t n>
 static void BM_StandardImplementation(benchmark::State& state)
 {
+	// f(x) = e^(-x^2) implemented with the std
+	// functions
+	const auto f = [](auto const& x)
+	{
+		return std::exp(-x * x);
+	};
+	
 	for (auto _ : state)
 	{
-		double area = estimate_area(f, a, b, n);
+		double area = std_trapz::estimate_area(f, a, b, n);
 		benchmark::DoNotOptimize(area);
 	}
 }
@@ -30,9 +25,16 @@ static void BM_StandardImplementation(benchmark::State& state)
 template <int a, int b, std::size_t n>
 static void BM_EigenImplementation(benchmark::State& state)
 {
+	// f(x) = e^(-x^2) implemented with Eigen3
+	// functions
+	const auto f = [](auto const& X) -> Eigen::ArrayXd
+	{
+		return Eigen::exp(-X.cwiseProduct(X));
+	};
+
 	for (auto _ : state)
 	{
-		double area = estimate_area_eigen(f_eigen, a, b, n);
+		double area = eigen_trapz::estimate_area(f, a, b, n);
 		benchmark::DoNotOptimize(area);
 	}
 }

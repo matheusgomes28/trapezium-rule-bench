@@ -4,21 +4,19 @@
 #include <Eigen/Dense>
 #include <Eigen/Core>
 
-
-template <typename Func>
-double estimate_area_eigen(Func f, double a, double b, std::size_t n)
+namespace eigen_trapz
 {
-	auto inputs = Eigen::VectorXd::LinSpaced(n + 1, a, b);
-	auto samples = f(inputs);
-	double h = (b - a) / n;
+	template <typename Func>
+	double estimate_area(Func f, double a, double b, std::size_t n)
+	{
+		auto const inputs = Eigen::VectorXd::LinSpaced(n + 1, a, b);
+		auto const samples = f(Eigen::Ref<Eigen::ArrayXd const>{inputs});
+		double const h = (b - a) / n;
 
-	
-	double const sum = samples.segment(1, n - 1).sum();
-	double const first = samples[0];
-	double const last = samples[n];
+		return (h / 2) * (samples[0] + samples[n] + 2 * samples.segment(1, n-1).sum());
+	}
+} // namespace eigen_traps
 
-	return (h / 2) * (samples[0] + samples[n] + 2 * samples.segment(1, n-1).sum());
-}
 
 
 #endif // EIGEN_TRAPEZIUM_H
